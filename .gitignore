@@ -1,0 +1,7 @@
+__pycache__/
+.ipynb_checkpoints/
+mlruns/
+.env
+*.pyc
+*.pkl
+.DS_Store

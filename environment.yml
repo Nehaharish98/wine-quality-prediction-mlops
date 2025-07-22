@@ -1,0 +1,22 @@
+name: wine-quality-mlops
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - jupyterlab
+  - scikit-learn
+  - pandas
+  - xgboost
+  - matplotlib
+  - seaborn
+  - numpy
+  - mlflow
+  - pyyaml
+  - ipykernel
+  - prefect
+  - pip:
+      - hydra-core
+      - fastapi
+      - uvicorn
