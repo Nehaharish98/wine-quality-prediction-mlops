@@ -1,6 +1,7 @@
 data:
-  red_path: data/raw/wine-quality-red.csv
-  white_path: data/raw/wine-quality-white.csv
-  target: quality
-  test_size: 0.2
-  random_state: 42
+  raw_data_red: "data/raw/wine-quality-red.csv"
+  raw_data_white: "data/raw/wine-quality-white.csv"
+
+mlflow:
+  experiment_name: "wine-quality-exp"
+  tracking_uri: "http://127.0.0.1:5000"

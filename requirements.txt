@@ -1,8 +1,13 @@
+mlflow
+jupyter
 scikit-learn
 pandas
+seaborn
+hyperopt
 xgboost
-mlflow
 prefect
-pyyaml
-flake8
-pytest
+numpy
+matplotlib
+scipy
+fastapi
+gunicorn 

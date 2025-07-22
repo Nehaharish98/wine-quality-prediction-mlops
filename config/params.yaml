@@ -1,4 +1,13 @@
-model_type: RandomForest
-params:
-  n_estimators: 100
-  max_depth: 10
+train:
+  test_size: 0.2
+  random_state: 42
+
+model:
+  random_forest:
+    n_estimators: 100
+    max_depth: 10
+
+  xgboost:
+    n_estimators: 100
+    max_depth: 5
+    learning_rate: 0.1
