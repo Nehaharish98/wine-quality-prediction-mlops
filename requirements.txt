@@ -11,3 +11,5 @@ matplotlib
 scipy
 fastapi
 gunicorn 
+evidently
+imbalanced-learn
