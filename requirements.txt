@@ -7,11 +7,11 @@ joblib==1.3.2
 # API framework
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
-pydantic>=2.7.0
+pydantic==2.5.0
 
 # MLOps tools
 mlflow==2.12.2
-dvc[s3]==3.48.4
+dvc[azure]==3.48.4
 prefect==2.16.4
 
 # Monitoring
@@ -20,12 +20,17 @@ prometheus-client==0.19.0
 # Testing
 pytest==7.4.3
 pytest-cov==4.1.0
+pytest-mock==3.12.0
 
 # Code quality
 black==23.12.1
 flake8==6.1.0
 isort==5.13.2
 pre-commit==3.6.0
+
+# Security
+bandit==1.7.5
+safety==2.3.5
 
 # Data processing
 pyarrow==14.0.2
@@ -35,5 +40,21 @@ azure-storage-blob==12.19.0
 azure-identity==1.15.0
 
 # Other utilities
-#python-multipart>=0.0.7
-requests>=2.32.0
+python-multipart==0.0.6
+requests==2.31.0
+pyyaml==6.0.1
+
+# Documentation
+mkdocs==1.5.3
+mkdocs-material==9.4.8
+
+# Load testing
+locust==2.17.0
+
+# Jupyter
+jupyter==1.0.0
+ipykernel==6.26.0
+
+# Visualization
+matplotlib==3.8.2
+seaborn==0.13.0
