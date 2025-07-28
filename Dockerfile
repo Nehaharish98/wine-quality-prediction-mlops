@@ -1,12 +1,14 @@
+# Use an official Python image
 FROM python:3.10-slim
 
-# Install dependencies
-RUN pip install mlflow scikit-learn pandas xgboost gunicorn
+WORKDIR /app
 
-# Expose MLflow model server port
-Expose 
+RUN pip install fastapi uvicorn gunicorn mlflow scikit-learn pandas xgboost
 
-# Set environment variables
-ENV MLFLOW_TRACKING_URI=http://mlflow-tracking.cloud:5000
+EXPOSE 8000
 
-CMD ["mlflow", "models", "serve", "-m", "models:/RandomForest-red@production", "--host", "0.0.0.0", "--no-conda"]
+COPY deployment/api.py .
+
+ENV MLFLOW_TRACKING_URI=http://host.docker.internal:5001
+
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "api:app", "--bind", "0.0.0.0:8000"]

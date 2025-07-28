@@ -1,23 +1,17 @@
-name: wine-mlops
+name: wine-pred
 channels:
   - conda-forge
-  - defaults
 dependencies:
-  - python=3.10
-  - pip
-  - jupyterlab
-  - scikit-learn
-  - pandas
-  - xgboost
+  - python=3.11
+  - scikit-learn>=1.4
+  - xgboost>=2.0
+  - pandas>=2.2
+  - numpy>=1.26
   - matplotlib
   - seaborn
-  - numpy
-  - mlflow
+  - mlflow>=2.9
+  - gunicorn>=20.1
   - pyyaml
-  - ipykernel
-  - prefect
+  - pip
   - pip:
-      - hydra-core
-      - fastapi
-      - pyyaml
-      - uvicorn
+      - urllib3>=2.2
