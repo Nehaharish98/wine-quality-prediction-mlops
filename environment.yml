@@ -1,17 +1,9 @@
 name: wine-pred
 channels:
   - conda-forge
+  - defaults
 dependencies:
   - python=3.11
-  - scikit-learn>=1.4
-  - xgboost>=2.0
-  - pandas>=2.2
-  - numpy>=1.26
-  - matplotlib
-  - seaborn
-  - mlflow>=2.9
-  - gunicorn>=20.1
-  - pyyaml
   - pip
   - pip:
-      - urllib3>=2.2
+    - -r requirements.txt

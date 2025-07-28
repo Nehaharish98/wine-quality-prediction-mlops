@@ -1,14 +1,28 @@
-# Use an official Python image
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 
-RUN pip install fastapi uvicorn gunicorn mlflow scikit-learn pandas xgboost
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
+# Copy requirements and install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy source code
+COPY . .
+
+# Install package in development mode
+RUN pip install -e .
+
+# Expose port
 EXPOSE 8000
 
-COPY deployment/api.py .
+# Set environment variables
+ENV MLFLOW_TRACKING_URI=http://mlflow-server:5000
+ENV PYTHONPATH=/app
 
-ENV MLFLOW_TRACKING_URI=http://host.docker.internal:5001
-
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "api:app", "--bind", "0.0.0.0:8000"]
+# Command to run the API
+CMD ["uvicorn", "src.wine_quality.api.app:app", "--host", "0.0.0.0", "--port", "8000"]

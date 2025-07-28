@@ -1,15 +1,39 @@
-mlflow
-jupyter
-scikit-learn
-pandas
-seaborn
-hyperopt
-xgboost
-prefect
-numpy
-matplotlib
-scipy
-fastapi
-gunicorn 
-evidently
-imbalanced-learn
+# Core ML libraries
+pandas==2.1.4
+numpy==1.24.3
+scikit-learn==1.4.2
+joblib==1.3.2
+
+# API framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# MLOps tools
+mlflow==2.12.2
+dvc[s3]==3.48.4
+prefect==2.16.4
+
+# Monitoring
+prometheus-client==0.19.0
+
+# Testing
+pytest==7.4.3
+pytest-cov==4.1.0
+
+# Code quality
+black==23.12.1
+flake8==6.1.0
+isort==5.13.2
+pre-commit==3.6.0
+
+# Data processing
+pyarrow==14.0.2
+
+# Cloud
+azure-storage-blob==12.19.0
+azure-identity==1.15.0
+
+# Other utilities
+python-multipart==0.0.6
+requests==2.31.0

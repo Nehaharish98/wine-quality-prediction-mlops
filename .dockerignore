@@ -1,0 +1,47 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+pip-log.txt
+
+# Jupyter
+.ipynb_checkpoints
+
+# Data
+data/raw/
+data/processed/
+*.csv
+*.parquet
+
+# Models (will be mounted)
+models/
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+
+# Documentation
+README.md
+docs/
+
+# Tests
+tests/
+
+# Terraform
+terraform/
+*.tfstate
+*.tfstate.*
+
+# MLflow artifacts (will be mounted)
+mlruns/
+mlartifacts/

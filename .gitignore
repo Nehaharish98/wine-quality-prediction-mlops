@@ -1,7 +1,47 @@
+# Python
 __pycache__/
-.ipynb_checkpoints/
-mlruns/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv
 .env
-*.pyc
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# DVC
+.dvc/cache
+
+# Data
+data/raw/
+data/processed/
+*.csv
+*.parquet
+
+# Models
+models/
 *.pkl
+*.joblib
+
+# IDE
+.vscode/
+.idea/
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Docker
+.dockerignore
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/

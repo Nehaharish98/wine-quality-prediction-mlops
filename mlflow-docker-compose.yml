@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mlflow-db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: mlflow
+      POSTGRES_USER: mlflow
+      POSTGRES_PASSWORD: mlflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mlflow-network
+
+  mlflow-server:
+    image: ghcr.io/mlflow/mlflow:v2.12.2
+    ports:
+      - "5000:5000"
+    environment:
+      - BACKEND_STORE_URI=postgresql://mlflow:mlflow@mlflow-db:5432/mlflow
+      - ARTIFACT_ROOT=s3://mlflow-artifacts-bucket
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    depends_on:
+      - mlflow-db
+    command: >
+      mlflow server
+      --backend-store-uri postgresql://mlflow:mlflow@mlflow-db:5432/mlflow
+      --default-artifact-root s3://mlflow-artifacts-bucket
+      --host 0.0.0.0
+      --port 5000
+    networks:
+      - mlflow-network
+
+volumes:
+  postgres_data:
+
+networks:
+  mlflow-network:
+    driver: bridge

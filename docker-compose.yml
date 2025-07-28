@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  wine-api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow-server:5000
+    volumes:
+      - ./models:/app/models
+    depends_on:
+      - mlflow-server
+    networks:
+      - wine-network
+
+  mlflow-server:
+    image: ghcr.io/mlflow/mlflow:v2.12.2
+    ports:
+      - "5000:5000"
+    environment:
+      - BACKEND_STORE_URI=sqlite:///mlflow.db
+      - ARTIFACT_ROOT=./artifacts
+    volumes:
+      - mlflow_data:/mlflow
+    networks:
+      - wine-network
+
+volumes:
+  mlflow_data:
+
+networks:
+  wine-network:
+    driver: bridge
