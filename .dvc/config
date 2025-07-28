@@ -1,0 +1,8 @@
+[core]
+    analytics = false
+    autostage = true
+[state]
+    save_dvc_files = false
+['remote "azure-storage"']
+    url = azure://dvcstore/wine-quality
+    account_name = winequalitystorage

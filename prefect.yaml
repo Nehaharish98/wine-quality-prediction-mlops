@@ -1,0 +1,50 @@
+# Welcome to your prefect.yaml file! You can use this file for storing and managing
+# configuration for deploying your flows. We recommend committing this file to source
+# control along with your flow code.
+
+# Generic metadata about this project
+name: wine-quality-mlops
+prefect-version: 2.16.4
+
+# build section allows you to manage and build docker images
+build:
+  - prefect_docker.deployments.steps.build_docker_image:
+      id: build-image
+      requires: prefect-docker>=0.3.0
+      image_name: wine-pred
+      tag: latest
+      dockerfile: Dockerfile
+
+# push section allows you to manage if and how this project is uploaded to remote locations
+push:
+  - prefect_docker.deployments.steps.push_docker_image:
+      requires: prefect-docker>=0.3.0
+      image_name: "{{ build-image.image }}"
+      tag: latest
+
+# pull section allows you to provide instructions for cloning this project in remote locations
+pull:
+  - prefect.deployments.steps.git_clone:
+      repository: https://github.com/Nehaharish98/wine-quality-prediction-mlops.git
+      branch: main
+
+# the deployments section allows you to provide configuration for deploying flows
+deployments:
+  - name: wine-quality-training
+    version: null
+    tags:
+      - wine-quality
+      - training
+    description: Daily training pipeline for wine quality prediction
+    entrypoint: prefect_flows/training_pipeline.py:training_pipeline
+    parameters: {}
+    work_pool:
+      name: docker-work-pool
+      work_queue_name: wine-quality-training
+      job_variables:
+        image: "{{ build-image.image }}"
+        networks:
+          - wine-network
+    schedule:
+      cron: "0 2 * * *"
+      timezone: "UTC"

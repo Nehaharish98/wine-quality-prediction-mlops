@@ -1,0 +1,39 @@
+base:
+  project: wine-quality-prediction
+  random_state: 42
+  target_col: quality
+
+data:
+  test_size: 0.2
+  validation_size: 0.2
+
+train:
+  n_estimators: 100
+  max_depth: 10
+  min_samples_split: 5
+  min_samples_leaf: 2
+  max_features: sqrt
+  random_state: 42
+
+evaluate:
+  metrics:
+    - f1_weighted
+    - f1_macro
+    - accuracy
+    - precision_macro
+    - recall_macro
+
+mlflow:
+  tracking_uri: http://localhost:5000
+  experiment_name: wine-quality
+  registered_model_name: wine-quality-prod
+  artifacts_location: ./mlruns
+
+paths:
+  data:
+    raw: data/raw/wine.csv
+    processed: data/processed/train.parquet
+  models:
+    model: models/model.pkl
+    metrics: models/metrics.json
+    evaluation: models/evaluation.json

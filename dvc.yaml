@@ -1,0 +1,40 @@
+stages:
+  download_data:
+    cmd: python scripts/download_data.py --out data/raw/wine.csv
+    outs:
+      - data/raw/wine.csv
+
+  preprocess_data:
+    cmd: python scripts/preprocess.py --in data/raw/wine.csv --out data/processed/train.parquet
+    deps:
+      - data/raw/wine.csv
+      - scripts/preprocess.py
+    outs:
+      - data/processed/train.parquet
+
+  train_model:
+    cmd: python scripts/train_model.py --data data/processed/train.parquet --model models/model.pkl --register_as wine-quality-prod
+    deps:
+      - data/processed/train.parquet
+      - scripts/train_model.py
+      - src/wine_quality/models/trainer.py
+    params:
+      - train.n_estimators
+      - train.max_depth
+      - train.min_samples_split
+      - train.random_state
+    outs:
+      - models/model.pkl
+    metrics:
+      - models/metrics.json:
+          cache: false
+
+  evaluate_model:
+    cmd: python scripts/evaluate_model.py --model models/model.pkl --data data/processed/train.parquet --output models/evaluation.json
+    deps:
+      - models/model.pkl
+      - data/processed/train.parquet
+      - scripts/evaluate_model.py
+    metrics:
+      - models/evaluation.json:
+          cache: false
