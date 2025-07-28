@@ -10,12 +10,12 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 setup(
     name="wine-quality-prediction",
     version="0.1.0",
-    author="Your Name",
-    author_email="your.email@example.com",
+    author="Neha Harish Kumar",
+    author_email="nehaharish67@gmail.com",
     description="MLOps pipeline for wine quality prediction",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/your-username/wine-quality-prediction-mlops",
+    url="https://github.com/Nehaharish98/wine-quality-prediction-mlops",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     classifiers=[

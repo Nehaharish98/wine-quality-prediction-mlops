@@ -37,4 +37,4 @@ ENV PYTHONPATH=/app
 ENV MODEL_PATH=/app/models/model.pkl
 
 # Command to run the API
-CMD ["uvicorn", "src.wine_quality.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "api.app:app", "--host", "0.0.0.0", "--port", "8000"]

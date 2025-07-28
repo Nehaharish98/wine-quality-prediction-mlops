@@ -17,7 +17,7 @@ stages:
     deps:
       - data/processed/train.parquet
       - scripts/train_model.py
-      - src/wine_quality/models/trainer.py
+      - models/trainer.py
     params:
       - train.n_estimators
       - train.max_depth
