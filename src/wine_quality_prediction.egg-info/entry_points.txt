@@ -1,0 +1,3 @@
+[console_scripts]
+wine-predict = wine_quality.api.app:main
+wine-train = scripts.train_model:main

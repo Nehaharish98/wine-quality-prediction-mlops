@@ -4,9 +4,9 @@ import argparse
 import os
 import yaml
 from pathlib import Path
-from models.trainer import WineQualityTrainer
-from data.loader import split_features_target
-from tracking.mlflow_logger import MLflowLogger
+from src.wine_quality.models.trainer import WineQualityTrainer
+from src.wine_quality.data.loader import split_features_target
+from src.wine_quality.tracking.mlflow_logger import MLflowLogger
 
 def load_params(params_path: str = "params.yaml") -> dict:
     """Load parameters from params.yaml."""
