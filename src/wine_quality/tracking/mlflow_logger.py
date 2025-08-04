@@ -4,11 +4,12 @@ import mlflow.sklearn
 from typing import Dict, Any
 from pathlib import Path
 import json
+import os
 
 class MLflowLogger:
     def __init__(self, tracking_uri: str = None, experiment_name: str = "wine-quality"):
         if tracking_uri:
-            mlflow.set_tracking_uri(tracking_uri)
+            mlflow.set_tracking_uri(f"file://{os.getcwd()}/mlruns")
 
         # Create or get experiment
         try:

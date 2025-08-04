@@ -22,7 +22,8 @@ RUN pip install -e .
 RUN mkdir -p models data/raw data/processed
 
 # Copy pre-trained model if available
-COPY models/ models/ 2>/dev/null || true
+#COPY models/ models/ 2>/dev/null || true
+COPY models/ models/
 
 # Expose port
 EXPOSE 8000
@@ -36,5 +37,5 @@ ENV MLFLOW_TRACKING_URI=http://mlflow-server:5000
 ENV PYTHONPATH=/app
 ENV MODEL_PATH=/app/models/model.pkl
 
-# Command to run the API
-CMD ["uvicorn", "api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Command to run the API - CORRECTED PATH
+CMD ["uvicorn", "wine_quality.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
