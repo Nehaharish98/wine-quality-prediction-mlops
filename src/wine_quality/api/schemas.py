@@ -17,7 +17,7 @@ class WineFeatures(BaseModel):
     sulphates: float = Field(..., description="Sulphates", ge=0)
     alcohol: float = Field(..., description="Alcohol", ge=0)
     wine_type: Optional[str] = Field(default="red", description="Wine type (red/white)")
-    
+
     def to_array(self) -> np.ndarray:
         """Convert to numpy array for prediction."""
         return np.array([[
@@ -33,7 +33,7 @@ class WineFeatures(BaseModel):
             self.sulphates,
             self.alcohol
         ]])
-    
+
     class Config:
         schema_extra = {
             "example": {
@@ -65,7 +65,7 @@ class BatchWineFeatures(BaseModel):
 class BatchPredictionResponse(BaseModel):
     """Batch prediction response."""
     predictions: List[PredictionResponse]
-    
+
 class HealthResponse(BaseModel):
     """Health check response."""
     status: str

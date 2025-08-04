@@ -1,40 +1,41 @@
-version: '3.8'
-
 services:
-  mlflow-db:
-    image: postgres:13
-    environment:
-      POSTGRES_DB: mlflow
-      POSTGRES_USER: mlflow
-      POSTGRES_PASSWORD: mlflow
+  mlflow-init:
+    image: ghcr.io/mlflow/mlflow:v2.12.2
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - mlflow-network
+      - mlflow_data:/mlflow
+    user: root
+    command: >
+      sh -c "
+        mkdir -p /mlflow/artifacts &&
+        chmod -R 777 /mlflow &&
+        chown -R 1000:1000 /mlflow
+      "
 
   mlflow-server:
     image: ghcr.io/mlflow/mlflow:v2.12.2
     ports:
       - "5000:5000"
+    volumes:
+      - mlflow_data:/mlflow
     environment:
-      - BACKEND_STORE_URI=postgresql://mlflow:mlflow@mlflow-db:5432/mlflow
-      - ARTIFACT_ROOT=s3://mlflow-artifacts-bucket
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - MLFLOW_BACKEND_STORE_URI=sqlite:///mlflow/mlflow.db
+      - MLFLOW_DEFAULT_ARTIFACT_ROOT=/mlflow/artifacts
     depends_on:
-      - mlflow-db
+      mlflow-init:
+        condition: service_completed_successfully
     command: >
       mlflow server
-      --backend-store-uri postgresql://mlflow:mlflow@mlflow-db:5432/mlflow
-      --default-artifact-root s3://mlflow-artifacts-bucket
+      --backend-store-uri sqlite:///mlflow/mlflow.db
+      --default-artifact-root /mlflow/artifacts
       --host 0.0.0.0
       --port 5000
-    networks:
-      - mlflow-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 volumes:
-  postgres_data:
-
-networks:
-  mlflow-network:
-    driver: bridge
+  mlflow_data:
+    driver: local

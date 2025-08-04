@@ -1,81 +1,87 @@
-"""Preprocess wine quality data."""
-import pandas as pd
-import argparse
-import yaml
-from pathlib import Path
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
+"""
+Preprocess wine quality data.
+"""
 
+import argparse
+from pathlib import Path
+
+import joblib
+import pandas as pd
+import yaml
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+
+# Utility: load params.yaml
 def load_params(params_path: str = "params.yaml") -> dict:
     """Load parameters from params.yaml."""
-    with open(params_path, 'r') as f:
+    with open(params_path, "r") as f:
         return yaml.safe_load(f)
 
-def preprocess_data(input_path: str, output_path: str, params: dict):
-    """Preprocess wine quality data."""
+
+# Main preprocessing function
+def preprocess_data(input_path: str, output_path: str, params: dict) -> None:
+    """Preprocess wine quality data and write parquet + scaler."""
     print(f"Loading data from {input_path}")
     df = pd.read_csv(input_path)
-    
+
+    # Basic cleaning
     print(f"Original dataset shape: {df.shape}")
-    
-    # Remove duplicates
     df = df.drop_duplicates()
-    print(f"After removing duplicates: {df.shape}")
-    
-    # Handle missing values
     df = df.dropna()
-    print(f"After removing null values: {df.shape}")
-    
-    # Feature engineering
-    feature_columns = [col for col in df.columns 
-                      if col not in [params['base']['target_col'], 'wine_type']]
-    
-    # Feature scaling for numeric columns
+    print(f"After dedup & drop-na:  {df.shape}")
+
+    # Remove the non-numeric 'wine_type' column completely
+    if "wine_type" in df.columns:
+        df = df.drop(columns=["wine_type"])
+        print("Removed column: wine_type")
+
+    # Feature scaling (numeric columns only, target excluded)
+    target_col = params["base"]["target_col"]
+    feature_columns = [col for col in df.columns if col != target_col]
+
     scaler = StandardScaler()
     df[feature_columns] = scaler.fit_transform(df[feature_columns])
-    
-    # Split data
-    target_col = params['base']['target_col']
-    test_size = params['data']['test_size']
-    random_state = params['base']['random_state']
-    
+
+    # Train / test split
+    test_size = params["data"]["test_size"]
+    random_state = params["base"]["random_state"]
+
     train_df, test_df = train_test_split(
-        df, 
-        test_size=test_size, 
+        df,
+        test_size=test_size,
         random_state=random_state,
-        stratify=df[target_col]
+        stratify=df[target_col],
     )
-    
-    # Save processed data
+
+    # Save outputs
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+
     train_df.to_parquet(output_path, index=False)
-    
-    # Save test set separately
-    test_output_path = output_path.replace('train.parquet', 'test.parquet')
-    test_df.to_parquet(test_output_path, index=False)
-    
-    print(f"Train data saved to {output_path}, shape: {train_df.shape}")
-    print(f"Test data saved to {test_output_path}, shape: {test_df.shape}")
-    
-    # Save scaler for later use
-    import joblib
+    test_df.to_parquet(
+        output_path.replace("train.parquet", "test.parquet"), index=False
+    )
+
+    # Save scaler for inference
     scaler_path = Path(output_path).parent / "scaler.pkl"
     joblib.dump(scaler, scaler_path)
-    print(f"Scaler saved to {scaler_path}")
 
+    print(f"Train saved to {output_path}  → shape {train_df.shape}")
+    print(
+        f"Test  saved to {output_path.replace('train', 'test')}  → shape {test_df.shape}"
+    )
+    print(f"Scaler saved to {scaler_path}")
+# CLI wrapper
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--in", dest="input_path", help="Input data path")
-    parser.add_argument("--out", dest="output_path", help="Output data path")
-    parser.add_argument("--params", default="params.yaml", help="Parameters file")
-    
+    parser.add_argument("--in", dest="input_path", help="Input CSV path")
+    parser.add_argument("--out", dest="output_path", help="Output parquet path")
+    parser.add_argument("--params", default="params.yaml", help="Params file path")
     args = parser.parse_args()
-    
-    # Load parameters
+
+    # Load params and resolve paths
     params = load_params(args.params)
-    
-    # Use paths from params if not provided
-    input_path = args.input_path or params['paths']['data']['raw']
-    output_path = args.output_path or params['paths']['data']['processed']
-    
+    input_path = args.input_path or params["paths"]["data"]["raw"]
+    output_path = args.output_path or params["paths"]["data"]["processed"]
+
     preprocess_data(input_path, output_path, params)

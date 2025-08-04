@@ -12,9 +12,9 @@ import os
 import uuid
 
 from .schemas import (
-    WineFeatures, 
-    PredictionResponse, 
-    BatchWineFeatures, 
+    WineFeatures,
+    PredictionResponse,
+    BatchWineFeatures,
     BatchPredictionResponse,
     HealthResponse,
     ModelInfo
@@ -54,7 +54,7 @@ model_version = None
 model_loaded = False
 feature_names = [
     "fixed_acidity", "volatile_acidity", "citric_acid", "residual_sugar",
-    "chlorides", "free_sulfur_dioxide", "total_sulfur_dioxide", 
+    "chlorides", "free_sulfur_dioxide", "total_sulfur_dioxide",
     "density", "pH", "sulphates", "alcohol"
 ]
 target_classes = list(range(3, 10))
@@ -62,9 +62,9 @@ target_classes = list(range(3, 10))
 def load_model():
     """Load the trained model."""
     global model, model_version, model_loaded
-    
+
     model_path = os.getenv("MODEL_PATH", "models/model.pkl")
-    
+
     try:
         if Path(model_path).exists():
             model = joblib.load(model_path)
@@ -82,7 +82,7 @@ def load_model():
             model_version = "dummy_model"
             model_loaded = True
             logger.info("Loaded dummy model for testing")
-        
+
         # Update metrics
         metrics_collector.update_health_status(model_loaded)
         if model_loaded:
@@ -92,7 +92,7 @@ def load_model():
                 'framework': 'scikit-learn',
                 'features': ','.join(feature_names)
             })
-            
+
         # Set baseline for drift detection (you would normally compute this from training data)
         baseline_features = {
             'fixed_acidity': 8.32,
@@ -108,7 +108,7 @@ def load_model():
             'alcohol': 10.42
         }
         drift_detector.set_baseline(baseline_features)
-        
+
     except Exception as e:
         logger.error(f"Error loading model: {e}")
         model_loaded = False
@@ -148,7 +148,7 @@ async def health_check():
     """Health check endpoint."""
     is_healthy = model_loaded
     metrics_collector.update_health_status(is_healthy)
-    
+
     return HealthResponse(
         status="healthy" if is_healthy else "unhealthy",
         model_loaded=model_loaded,
@@ -161,7 +161,7 @@ async def get_model_info():
     """Get model information."""
     if not model_loaded:
         raise HTTPException(status_code=503, detail="Model not loaded")
-    
+
     return ModelInfo(
         model_name="Wine Quality Predictor",
         model_version=model_version,
@@ -176,11 +176,11 @@ async def predict_wine_quality(wine: WineFeatures, request: Request):
     """Predict wine quality for a single sample."""
     if not model_loaded:
         raise HTTPException(status_code=503, detail="Model not loaded")
-    
+
     try:
         # Prepare input data
         input_data = wine.to_array()
-        
+
         # Update drift detection
         feature_dict = {
             'fixed_acidity': wine.fixed_acidity,
@@ -196,31 +196,31 @@ async def predict_wine_quality(wine: WineFeatures, request: Request):
             'alcohol': wine.alcohol
         }
         drift_detector.update_current_stats(feature_dict)
-        
+
         # Make prediction
         prediction = model.predict(input_data)[0]
         probabilities = model.predict_proba(input_data)[0]
-        
+
         # Calculate confidence
         confidence = float(np.max(probabilities))
-        
+
         # Create probability dictionary
         prob_dict = {
-            str(class_): float(prob) 
+            str(class_): float(prob)
             for class_, prob in zip(target_classes, probabilities)
         }
-        
+
         # Record prediction metrics
         metrics_collector.record_prediction(int(prediction))
-        
+
         logger.info(f"Prediction made: quality={prediction}, confidence={confidence:.3f}")
-        
+
         return PredictionResponse(
             quality=int(prediction),
             confidence=confidence,
             probabilities=prob_dict
         )
-        
+
     except Exception as e:
         logger.error(f"Prediction error: {e}")
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
@@ -231,40 +231,40 @@ async def predict_batch_wine_quality(batch: BatchWineFeatures):
     """Predict wine quality for multiple samples."""
     if not model_loaded:
         raise HTTPException(status_code=503, detail="Model not loaded")
-    
+
     try:
         predictions = []
-        
+
         for wine in batch.wines:
             # Prepare input data
             input_data = wine.to_array()
-            
+
             # Make prediction
             prediction = model.predict(input_data)[0]
             probabilities = model.predict_proba(input_data)[0]
-            
+
             # Calculate confidence
             confidence = float(np.max(probabilities))
-            
+
             # Create probability dictionary
             prob_dict = {
-                str(class_): float(prob) 
+                str(class_): float(prob)
                 for class_, prob in zip(target_classes, probabilities)
             }
-            
+
             # Record prediction metrics
             metrics_collector.record_prediction(int(prediction))
-            
+
             predictions.append(PredictionResponse(
                 quality=int(prediction),
                 confidence=confidence,
                 probabilities=prob_dict
             ))
-        
+
         logger.info(f"Batch prediction completed: {len(predictions)} samples")
-        
+
         return BatchPredictionResponse(predictions=predictions)
-        
+
     except Exception as e:
         logger.error(f"Batch prediction error: {e}")
         raise HTTPException(status_code=500, detail=f"Batch prediction failed: {str(e)}")
@@ -274,7 +274,7 @@ async def predict_batch_wine_quality(batch: BatchWineFeatures):
 async def get_drift_report():
     """Get current drift report."""
     drift_scores = drift_detector.calculate_drift()
-    
+
     return {
         "drift_scores": drift_scores,
         "sample_count": drift_detector.sample_count,
